@@ -1,4 +1,4 @@
-# Logs
+`# Logs
 logs
 *.log
 npm-debug.log*
@@ -37,3 +37,6 @@ __screenshots__/
 
 test-results/
 playwright-report/
+/requirements/
+/CLAUDE.md
+/IMPLEMENTATION_PLAN.md
