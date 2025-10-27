@@ -1,12 +1,7 @@
 import type { ActionContext, GetterTree, Module, MutationTree } from 'vuex'
-import {
-  HORSE_COLORS,
-  HORSE_NAMES,
-  HORSES_PER_RACE,
-  ROUND_DISTANCES,
-  TOTAL_HORSES,
-  TOTAL_ROUNDS,
-} from '@/utils/constants'
+import { useHorseGeneration } from '@/composables/useHorseGeneration'
+import { useRaceSchedule } from '@/composables/useRaceSchedule'
+import { TOTAL_ROUNDS } from '@/utils/constants'
 
 export interface Horse {
   id: number
@@ -120,34 +115,14 @@ const racingModule: Module<RacingState, any> = {
 
   actions: {
     generateHorses({ commit }: ActionContext<RacingState, any>) {
-      const horses: Horse[] = []
-      for (let i = 0; i < TOTAL_HORSES; i++) {
-        horses.push({
-          id: i + 1,
-          name: HORSE_NAMES[i] ?? '',
-          color: HORSE_COLORS[i] ?? '',
-          condition: Math.floor(Math.random() * 100) + 1,
-        })
-      }
+      const { generateHorses } = useHorseGeneration()
+      const horses = generateHorses()
       commit('SET_HORSES', horses)
     },
 
     generateSchedule({ commit, state }: ActionContext<RacingState, any>) {
-      const schedule: Round[] = []
-      const availableHorses = [...state.horses]
-
-      for (let i = 0; i < TOTAL_ROUNDS; i++) {
-        const shuffled = [...availableHorses].sort(() => Math.random() - 0.5)
-        const selectedHorses = shuffled.slice(0, HORSES_PER_RACE)
-
-        schedule.push({
-          roundNumber: i + 1,
-          distance: ROUND_DISTANCES[i] ?? 1000,
-          horses: selectedHorses,
-          results: null,
-        })
-      }
-
+      const { generateSchedule } = useRaceSchedule()
+      const schedule = generateSchedule(state.horses)
       commit('SET_SCHEDULE', schedule)
       commit('RESET_GAME')
       commit('SET_SCHEDULE', schedule)

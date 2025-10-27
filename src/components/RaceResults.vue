@@ -8,53 +8,58 @@ const raceResults = computed(() => store.state.racing.raceResults)
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">
-      Race Results
-    </h2>
-
-    <div v-if="raceResults.length === 0" class="text-gray-500 text-center py-8">
-      Results will appear here after each race
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Header (Green) -->
+    <div class="bg-green-500 text-white px-4 py-3 font-bold text-center">
+      Results
     </div>
 
-    <div v-else class="space-y-4">
+    <!-- Content -->
+    <div v-if="raceResults.length === 0" class="p-6 text-center text-gray-500 text-sm">
+      Results will appear after each race
+    </div>
+
+    <div v-else class="p-3 space-y-3 max-h-[350px] overflow-y-auto">
       <div
         v-for="result in raceResults"
         :key="result.roundNumber"
-        class="border-2 border-gray-300 rounded-lg p-4"
+        class="border-2 border-green-400 rounded p-2"
       >
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="font-bold text-lg">
-            Round {{ result.roundNumber }}
-          </h3>
-          <span class="text-gray-600">{{ result.distance }}m</span>
+        <div class="bg-green-100 px-2 py-1 rounded mb-2 text-xs font-semibold">
+          {{ result.roundNumber }}st Lap {{ result.distance }}m
         </div>
 
-        <div class="space-y-2">
-          <div
-            v-for="(ranking, idx) in result.rankings.slice(0, 3)"
-            :key="ranking.horseId"
-            class="flex items-center gap-3 p-2 rounded"
-            :class="{
-              'bg-yellow-100': idx === 0,
-              'bg-gray-100': idx === 1,
-              'bg-orange-100': idx === 2,
-            }"
-          >
-            <div class="text-2xl">
-              {{ idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉' }}
-            </div>
-            <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: ranking.color }" />
-            <div class="flex-1">
-              <div class="font-semibold">
+        <table class="w-full text-xs">
+          <thead class="border-b">
+            <tr>
+              <th class="text-left p-1">
+                Position
+              </th>
+              <th class="text-left p-1">
+                Name
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(ranking, idx) in result.rankings"
+              :key="ranking.horseId"
+              class="border-b last:border-0"
+              :class="{
+                'bg-yellow-100 font-bold': idx === 0,
+                'bg-gray-100': idx === 1,
+                'bg-orange-100': idx === 2,
+              }"
+            >
+              <td class="p-1">
+                {{ idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : ranking.position }}
+              </td>
+              <td class="p-1">
                 {{ ranking.name }}
-              </div>
-              <div class="text-xs text-gray-600">
-                Time: {{ ranking.time.toFixed(2) }}s | Speed: {{ ranking.speed.toFixed(2) }}m/s
-              </div>
-            </div>
-          </div>
-        </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

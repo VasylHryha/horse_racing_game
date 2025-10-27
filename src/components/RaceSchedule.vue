@@ -10,44 +10,48 @@ const isScheduleGenerated = computed(() => store.state.racing.isScheduleGenerate
 const currentRound = computed(() => store.state.racing.currentRound)
 const isRacing = computed(() => store.state.racing.isRacing)
 const raceResults = computed(() => store.state.racing.raceResults)
+
+function isCurrentRound(round: any) {
+  return currentRound.value === round.roundNumber - 1 && isRacing.value
+}
+
+function isCompleted(round: any) {
+  return raceResults.value.some((r: RaceResult) => r.roundNumber === round.roundNumber)
+}
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">
-      Race Schedule
-    </h2>
-
-    <div v-if="!isScheduleGenerated" class="text-gray-500 text-center py-8">
-      Click "Generate Schedule" to create the race schedule
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Header (Blue) -->
+    <div class="bg-blue-500 text-white px-4 py-3 font-bold text-center">
+      Program
     </div>
 
-    <div v-else class="space-y-3">
+    <!-- Content -->
+    <div v-if="!isScheduleGenerated" class="p-6 text-center text-gray-500">
+      Click "GENERATE PROGRAM" to create schedule
+    </div>
+
+    <div v-else class="p-3 space-y-2 max-h-[350px] overflow-y-auto">
       <div
         v-for="round in schedule"
         :key="round.roundNumber"
-        class="border-2 rounded-lg p-4 transition"
+        class="border-2 rounded p-2 text-xs transition"
         :class="{
-          'border-blue-500 bg-blue-50': currentRound === round.roundNumber - 1 && isRacing,
-          'border-green-500 bg-green-50': raceResults.some((r: RaceResult) => r.roundNumber === round.roundNumber),
-          'border-gray-300': currentRound !== round.roundNumber - 1 || !isRacing,
+          'border-blue-500 bg-blue-50': isCurrentRound(round),
+          'border-green-500 bg-green-50': isCompleted(round),
+          'border-gray-300 bg-white': !isCurrentRound(round) && !isCompleted(round),
         }"
       >
-        <div class="flex justify-between items-center mb-2">
-          <h3 class="font-bold text-lg">
-            Round {{ round.roundNumber }}
-          </h3>
-          <span class="text-gray-600">{{ round.distance }}m</span>
+        <div class="font-bold mb-1 flex justify-between items-center">
+          <span>{{ round.roundNumber }}st Lap {{ round.distance }}m</span>
+          <span v-if="isCompleted(round)" class="text-green-600">✓</span>
         </div>
-        <div class="flex flex-wrap gap-2">
-          <span
-            v-for="horse in round.horses"
-            :key="horse.id"
-            class="px-2 py-1 rounded text-xs font-semibold text-white"
-            :style="{ backgroundColor: horse.color }"
-          >
-            {{ horse.name }}
-          </span>
+        <div class="grid grid-cols-2 gap-x-2 gap-y-0.5">
+          <div v-for="(horse, idx) in round.horses" :key="horse.id" class="flex gap-1">
+            <span class="text-gray-500">{{ idx + 1 }}</span>
+            <span class="truncate">{{ horse.name }}</span>
+          </div>
         </div>
       </div>
     </div>
