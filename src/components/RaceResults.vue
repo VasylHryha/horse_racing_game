@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import { useRaceDataStore } from '@/stores/useRaceDataStore'
+import { getOrdinalSuffix } from '@/utils/ordinal'
 
-const store = useStore()
-
-const raceResults = computed(() => store.state.racing.raceResults)
+const raceDataStore = useRaceDataStore()
+const { raceResults } = storeToRefs(raceDataStore)
 </script>
 
 <template>
@@ -26,7 +26,7 @@ const raceResults = computed(() => store.state.racing.raceResults)
         class="border-2 border-green-400 rounded p-2"
       >
         <div class="bg-green-100 px-2 py-1 rounded mb-2 text-xs font-semibold">
-          {{ result.roundNumber }}st Lap {{ result.distance }}m
+          {{ getOrdinalSuffix(result.roundNumber) }} Lap {{ result.distance }}m
         </div>
 
         <table class="w-full text-xs">

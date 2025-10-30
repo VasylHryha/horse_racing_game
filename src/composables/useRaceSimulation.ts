@@ -1,151 +1,188 @@
-import type { Horse, HorsePosition, HorseRanking, RaceState, Round } from '@/store/modules/racing'
+import type { Ref } from 'vue'
+import type { Horse, HorsePosition, HorseRanking, RaceState, Round } from '@/types'
 import { ref } from 'vue'
-import { TIME_COMPRESSION } from '@/utils/constants'
+import { TIME_COMPRESSION } from '@/constants'
 
-export function useRaceSimulation() {
-  // State
+type RaceHorse = Horse & { effectiveSpeed: number }
+
+function hasEffectiveSpeed(h: Horse): h is RaceHorse {
+  return typeof (h as any).effectiveSpeed === 'number'
+}
+
+export interface UseRaceSimulation {
+  raceState: Ref<RaceState | null>
+  isAnimating: Ref<boolean>
+  simulateRace: (
+    round: Round,
+    speedMultiplier: number,
+    onProgress: (state: RaceState) => void,
+    onComplete: (rankings: HorseRanking[]) => void,
+    isPaused?: () => boolean,
+    options?: { signal?: AbortSignal },
+  ) => Promise<void>
+  abort: () => void
+  reset: () => void
+}
+
+export function useRaceSimulation(): UseRaceSimulation {
   const raceState = ref<RaceState | null>(null)
   const isAnimating = ref(false)
 
-  // Calculate horse speeds based on condition
-  function calculateHorseSpeeds(horses: Horse[]): Record<number, number> {
-    const speeds: Record<number, number> = {}
-    horses.forEach((horse) => {
-      const baseSpeed = 12 + Math.random() * 6 // 12-18 m/s
-      speeds[horse.id] = baseSpeed * (horse.condition / 100)
-    })
-    return speeds
+  let rafId: number | null = null
+  let abortController: AbortController | null = null
+
+  const cancelRAF = () => {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+      rafId = null
+    }
   }
 
-  // Main race simulation function
-  async function simulateRace(
-    round: Round,
-    onProgress: (state: RaceState) => void,
-    onComplete: (rankings: HorseRanking[]) => void,
-  ): Promise<void> {
-    const distance = round.distance
-    const horseSpeeds = calculateHorseSpeeds(round.horses)
-    const finishTimes: Record<number, number> = {}
-    const finishedHorses: Set<number> = new Set()
+  const abort = () => abortController?.abort()
 
-    const startTime = Date.now()
+  const reset = () => {
+    cancelRAF()
+    abortController?.abort()
+    abortController = null
+    isAnimating.value = false
+    raceState.value = null
+  }
+
+  const simulateRace: UseRaceSimulation['simulateRace'] = async (
+    round,
+    speedMultiplier,
+    onProgress,
+    onComplete,
+    isPaused,
+    options,
+  ) => {
+    reset()
+
+    const distance = Math.max(1, round.distance)
+    const speed = Math.max(0.0001, speedMultiplier)
+
+    const finishTimes = new Map<number, number>()
+    const positions = new Map<number, HorsePosition>()
+
+    let totalPausedMs = 0
+    let pauseStartMs = 0
+    const startMs = performance.now()
+
+    // Abort setup
+    abortController = new AbortController()
+    const signal = abortController.signal
+
+    if (options?.signal?.aborted) {
+      abortController.abort()
+      return
+    }
+
+    const forwardAbort = () => abortController?.abort()
+    options?.signal?.addEventListener('abort', forwardAbort)
+
     isAnimating.value = true
 
     return new Promise<void>((resolve) => {
-      const animate = () => {
-        const realElapsed = (Date.now() - startTime) / 1000
-        const simulatedTime = realElapsed * TIME_COMPRESSION
-
-        const currentState: RaceState = {
-          elapsedTime: simulatedTime,
-          positions: {} as Record<number, HorsePosition>,
+      const tick = () => {
+        if (signal.aborted) {
+          options?.signal?.removeEventListener('abort', forwardAbort)
+          return
         }
 
-        const rankings: HorseRanking[] = []
+        // Handle pause
+        if (isPaused?.()) {
+          if (pauseStartMs === 0)
+            pauseStartMs = performance.now()
+          rafId = requestAnimationFrame(tick)
+          return
+        }
+        if (pauseStartMs > 0) {
+          totalPausedMs += performance.now() - pauseStartMs
+          pauseStartMs = 0
+        }
 
-        // Update each horse position
-        round.horses.forEach((horse) => {
-          const speed = horseSpeeds[horse.id] ?? 0
-          let distanceCovered = speed * simulatedTime
+        // Calculate time
+        const elapsedMs = performance.now() - startMs - totalPausedMs
+        const simTime = Math.max(0, elapsedMs / 1000) * TIME_COMPRESSION * speed
 
-          // ===== CRITICAL: FINISH LINE LOGIC =====
-          let progress = distanceCovered / distance
-          let isFinished = false
+        // Update positions
+        positions.clear()
+        for (const horse of round.horses) {
+          const effectiveSpeed = hasEffectiveSpeed(horse) ? horse.effectiveSpeed : 0
+
+          let dist = effectiveSpeed * simTime
+          let progress = dist / distance
+          let finished = false
 
           if (progress >= 1) {
-            progress = 1 // CAP AT FINISH LINE
-            distanceCovered = distance // STOP EXACTLY AT DISTANCE
-            isFinished = true
-
-            // Record finish time ONLY ONCE
-            if (!finishedHorses.has(horse.id)) {
-              finishTimes[horse.id] = simulatedTime
-              finishedHorses.add(horse.id)
+            progress = 1
+            dist = distance
+            finished = true
+            if (!finishTimes.has(horse.id)) {
+              finishTimes.set(horse.id, simTime)
             }
           }
-          // ======================================
 
-          currentState.positions[horse.id] = {
-            distance: distanceCovered,
+          positions.set(horse.id, {
+            distance: dist,
             progress,
-            finished: isFinished,
-            time: isFinished ? (finishTimes[horse.id] ?? 0) : null,
-            rank: 0, // Will be calculated below
-          }
+            finished,
+            time: finished ? finishTimes.get(horse.id)! : null,
+            rank: 0,
+          })
+        }
 
-          // Add to rankings if finished
-          if (isFinished && finishTimes[horse.id] !== undefined) {
-            rankings.push({
-              horseId: horse.id,
-              name: horse.name,
-              color: horse.color,
-              time: finishTimes[horse.id] ?? 0,
-              speed: speed ?? 0,
-              position: 0,
-            })
-          }
+        // Rank finished by time
+        const finished = Array.from(finishTimes.entries())
+          .sort(([, a], [, b]) => a - b)
+
+        finished.forEach(([id], i) => {
+          positions.get(id)!.rank = i + 1
         })
 
-        // Sort rankings by finish time (earliest wins)
-        rankings.sort((a, b) => a.time - b.time)
-        rankings.forEach((r, idx) => {
-          r.position = idx + 1
-          const pos = currentState.positions[r.horseId]
-          if (pos) {
-            pos.rank = idx + 1
-          }
+        // Rank unfinished by distance
+        const unfinished = Array.from(positions.entries())
+          .filter(([, p]) => !p.finished)
+          .sort(([, a], [, b]) => b.distance - a.distance)
+
+        unfinished.forEach(([id, p]) => {
+          p.rank = finished.length + unfinished.indexOf([id, p]) + 1
         })
 
-        // Calculate current rankings for unfinished horses
-        round.horses.forEach((horse) => {
-          const horsePos = currentState.positions[horse.id]
-          if (horsePos && !horsePos.finished) {
-            const currentRankings = round.horses
-              .map(h => ({
-                id: h.id,
-                distance: currentState.positions[h.id]?.distance ?? 0,
-              }))
-              .sort((a, b) => b.distance - a.distance)
+        // Emit state
+        const state: RaceState = {
+          elapsedTime: simTime,
+          positions: Object.fromEntries(positions),
+        }
+        raceState.value = state
+        onProgress(state)
 
-            const rank = currentRankings.findIndex(r => r.id === horse.id) + 1
-            horsePos.rank = rank
-          }
-        })
-
-        raceState.value = currentState
-        onProgress(currentState)
-
-        // Check if ALL horses finished
-        const allFinished = round.horses.every(
-          horse => currentState.positions[horse.id]?.finished ?? false,
-        )
-
-        if (allFinished) {
-          // Build final complete rankings
-          const finalRankings: HorseRanking[] = round.horses.map(horse => ({
-            horseId: horse.id,
-            name: horse.name,
-            color: horse.color,
-            time: finishTimes[horse.id] ?? 0,
-            speed: horseSpeeds[horse.id] ?? 0,
+        // Check complete
+        if (finishTimes.size === round.horses.length) {
+          const rankings: HorseRanking[] = round.horses.map(h => ({
+            horseId: h.id,
+            name: h.name,
+            color: h.color,
+            time: finishTimes.get(h.id) ?? Infinity,
+            speed: hasEffectiveSpeed(h) ? h.effectiveSpeed : 0,
             position: 0,
           }))
 
-          finalRankings.sort((a, b) => a.time - b.time)
-          finalRankings.forEach((r, idx) => {
-            r.position = idx + 1
-          })
+          rankings.sort((a, b) => a.time - b.time)
+          rankings.forEach((r, i) => r.position = i + 1)
 
           isAnimating.value = false
-          onComplete(finalRankings)
+          cancelRAF()
+          onComplete(rankings)
+          options?.signal?.removeEventListener('abort', forwardAbort)
           resolve()
+          return
         }
-        else {
-          requestAnimationFrame(animate)
-        }
+
+        rafId = requestAnimationFrame(tick)
       }
 
-      animate()
+      rafId = requestAnimationFrame(tick)
     })
   }
 
@@ -153,6 +190,7 @@ export function useRaceSimulation() {
     raceState,
     isAnimating,
     simulateRace,
-    calculateHorseSpeeds,
+    abort,
+    reset,
   }
 }

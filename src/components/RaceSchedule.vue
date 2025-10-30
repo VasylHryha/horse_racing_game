@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import type { RaceResult } from '@/store/modules/racing'
-import { computed } from 'vue'
-import { useStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import { useRaceDataStore } from '@/stores/useRaceDataStore'
+import { useUIControlStore } from '@/stores/useUIControlStore'
+import { getOrdinalSuffix } from '@/utils/ordinal'
 
-const store = useStore()
+const raceDataStore = useRaceDataStore()
+const uiControlStore = useUIControlStore()
 
-const schedule = computed(() => store.state.racing.schedule)
-const isScheduleGenerated = computed(() => store.state.racing.isScheduleGenerated)
-const currentRound = computed(() => store.state.racing.currentRound)
-const isRacing = computed(() => store.state.racing.isRacing)
-const raceResults = computed(() => store.state.racing.raceResults)
+const { schedule, currentRound, raceResults } = storeToRefs(raceDataStore)
+const { isScheduleGenerated, isRacing } = storeToRefs(uiControlStore)
 
 function isCurrentRound(round: any) {
   return currentRound.value === round.roundNumber - 1 && isRacing.value
 }
 
 function isCompleted(round: any) {
-  return raceResults.value.some((r: RaceResult) => r.roundNumber === round.roundNumber)
+  return raceResults.value.some(r => r.roundNumber === round.roundNumber)
 }
 </script>
 
@@ -44,7 +43,7 @@ function isCompleted(round: any) {
         }"
       >
         <div class="font-bold mb-1 flex justify-between items-center">
-          <span>{{ round.roundNumber }}st Lap {{ round.distance }}m</span>
+          <span>{{ getOrdinalSuffix(round.roundNumber) }} Lap {{ round.distance }}m</span>
           <span v-if="isCompleted(round)" class="text-green-600">✓</span>
         </div>
         <div class="grid grid-cols-2 gap-x-2 gap-y-0.5">

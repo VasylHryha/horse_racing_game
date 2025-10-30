@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
-import { useStore } from '@/store'
+import { useRaceDataStore } from '@/stores/useRaceDataStore'
 
-const store = useStore()
+const raceDataStore = useRaceDataStore()
 
-const horses = computed(() => store.state.racing.horses)
+const { horses, currentRoundData } = storeToRefs(raceDataStore)
 const currentRoundHorses = computed(() => {
-  const round = store.getters['racing/currentRoundData']
-  return round ? round.horses.map((h: any) => h.id) : []
+  return currentRoundData.value ? currentRoundData.value.horses.map(h => h.id) : []
 })
 </script>
 

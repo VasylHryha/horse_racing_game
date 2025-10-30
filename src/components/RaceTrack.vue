@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useStore } from '@/store'
+import { storeToRefs } from 'pinia'
+import { useRaceAnimationStore } from '@/stores/useRaceAnimationStore'
+import { useRaceDataStore } from '@/stores/useRaceDataStore'
+import { getOrdinalSuffix } from '@/utils/ordinal'
 import HorseRunner from './HorseRunner.vue'
 
-const store = useStore()
+const raceDataStore = useRaceDataStore()
+const raceAnimationStore = useRaceAnimationStore()
 
-const currentRound = computed(() => store.getters['racing/currentRoundData'])
-const raceState = computed(() => store.state.racing.currentRaceState)
+const { currentRoundData: currentRound } = storeToRefs(raceDataStore)
+const { currentRaceState: raceState } = storeToRefs(raceAnimationStore)
 </script>
 
 <template>
@@ -59,7 +62,7 @@ const raceState = computed(() => store.state.racing.currentRaceState)
 
       <!-- Bottom lap info -->
       <div class="mt-4 text-sm font-semibold text-gray-700">
-        {{ currentRound.roundNumber }}st Lap {{ currentRound.distance }}m
+        {{ getOrdinalSuffix(currentRound.roundNumber) }} Lap {{ currentRound.distance }}m
       </div>
     </div>
   </div>

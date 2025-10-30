@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Horse, HorsePosition } from '@/store/modules/racing'
+import type { Horse, HorsePosition } from '@/types'
 import { computed } from 'vue'
 
 interface Props {
