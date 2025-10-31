@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted } from 'vue'
 
-const props = withDefaults(defineProps<{
-  modelValue: boolean
+withDefaults(defineProps<{
   title?: string
   widthClass?: string // e.g. 'w-[380px]'
   closeOnOverlay?: boolean
@@ -12,11 +11,7 @@ const props = withDefaults(defineProps<{
   closeOnOverlay: true,
 })
 
-const emit = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
-const open = computed({
-  get: () => props.modelValue,
-  set: v => emit('update:modelValue', v),
-})
+const open = defineModel<boolean>()
 
 function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape' && open.value)
@@ -41,10 +36,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   </div>
 
   <!-- Panel -->
-  <div
+  <dialog
     v-show="open"
     class="fixed inset-y-0 left-0 z-50 flex outline-none"
-    role="dialog"
     aria-modal="true"
   >
     <transition
@@ -80,5 +74,5 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
     </transition>
     <!-- Spacer to keep layout from shifting on scrollbars -->
     <div aria-hidden="true" class="w-0" />
-  </div>
+  </dialog>
 </template>

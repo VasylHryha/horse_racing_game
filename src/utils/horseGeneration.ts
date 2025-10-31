@@ -1,7 +1,7 @@
 // horse-utils.ts (or wherever it already lives)
 import type { Horse } from '@/types'
 import { HORSE_COLORS, HORSE_NAMES, HORSE_SPEED, TOTAL_HORSES } from '@/constants'
-import { computeEffectiveSpeed } from '@/utils/horseRaceHelpers.ts'
+import { computeEffectiveSpeed } from '@/utils/horseRaceHelpers'
 import { mulberry32 } from './seedGenerator'
 
 const MIN_CONDITION = 40

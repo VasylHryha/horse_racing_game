@@ -11,7 +11,11 @@ const { raceResults } = storeToRefs(raceDataStore)
 const isOpen = ref(true)
 const subtitle = computed(() => {
   const n = raceResults.value.length
-  return n ? `${n} result${n === 1 ? '' : 's'}` : 'Waiting…'
+
+  if (n) {
+    return `${n} result${n === 1 ? '' : 's'}`
+  }
+  return 'Waiting…'
 })
 </script>
 

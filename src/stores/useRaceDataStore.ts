@@ -3,10 +3,10 @@ import type { Horse, RaceResult, Round } from '@/types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { TOTAL_ROUNDS } from '@/constants'
-import { generateHorses } from '@/utils/horseGeneration'
+import { generateHorses as generateHorsesUtil } from '@/utils/horseGeneration'
 import { mutateRaceHorses } from '@/utils/horseRaceHelpers'
 import { pickFixedParticipants } from '@/utils/raceParticipants'
-import { generateSchedule } from '@/utils/raceSchedule'
+import { generateSchedule as generateScheduleUtil } from '@/utils/raceSchedule'
 
 export const useRaceDataStore = defineStore('raceData', () => {
   // Base horses (immutable across the card)
@@ -32,21 +32,21 @@ export const useRaceDataStore = defineStore('raceData', () => {
   const currentRaceHorseIds = computed(() => raceHorses.value.map(h => h.id))
 
   // Actions
-  function generateNewHorses() {
-    horses.value = generateHorses()
+  function generateHorses() {
+    horses.value = generateHorsesUtil()
     fixedParticipants.value = []
     raceHorses.value = []
   }
 
-  function generateNewSchedule() {
+  function generateSchedule() {
     if (horses.value.length === 0)
-      generateNewHorses()
+      generateHorses()
 
     // Pick fixed 10 for the whole race card (seed optional)
     fixedParticipants.value = pickFixedParticipants(horses.value /* , seed */)
 
     // Build schedule for these participants
-    schedule.value = generateSchedule(fixedParticipants.value)
+    schedule.value = generateScheduleUtil(fixedParticipants.value)
 
     currentRound.value = 0
     raceResults.value = []
@@ -58,10 +58,6 @@ export const useRaceDataStore = defineStore('raceData', () => {
   /** Re-roll condition & effectiveSpeed IN-PLACE for the current round */
   function rerollRaceHorsesForCurrentRound(seed?: number) {
     mutateRaceHorses(raceHorses.value, seed)
-  }
-
-  function clearPreparedHorses() {
-    raceHorses.value = []
   }
 
   function completeRound(result: RaceResult) {
@@ -76,7 +72,7 @@ export const useRaceDataStore = defineStore('raceData', () => {
     raceResults.value = []
     fixedParticipants.value = []
     raceHorses.value = []
-    generateNewHorses()
+    generateHorses()
   }
 
   function resetData() {
@@ -87,6 +83,8 @@ export const useRaceDataStore = defineStore('raceData', () => {
     currentRound.value = 0
     raceResults.value = []
   }
+
+  // No aliases needed; primary names are concise
 
   return {
     // State
@@ -104,10 +102,9 @@ export const useRaceDataStore = defineStore('raceData', () => {
     currentRaceHorses,
     currentRaceHorseIds,
     // Actions
-    generateNewHorses,
-    generateNewSchedule,
+    generateHorses,
+    generateSchedule,
     rerollRaceHorsesForCurrentRound,
-    clearPreparedHorses,
     completeRound,
     resetGame,
     resetData,

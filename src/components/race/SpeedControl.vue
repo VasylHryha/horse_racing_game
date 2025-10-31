@@ -6,7 +6,12 @@ import { SPEED_PRESETS } from '@/constants'
 import { useUIControlStore } from '@/stores/useUIControlStore'
 
 type SpeedPreset = keyof typeof SPEED_PRESETS
-interface PresetShape { label: string, multiplier: number, icon?: string }
+
+interface PresetShape {
+  label: string
+  multiplier: number
+  icon?: string
+}
 
 const ui = useUIControlStore()
 const { speedMultiplier, isRacing } = storeToRefs(ui)
@@ -27,6 +32,7 @@ function setSpeed(preset: SpeedPreset) {
     return
   ui.updateSpeed(SPEED_PRESETS[preset].multiplier)
 }
+
 function isActive(preset: SpeedPreset) {
   return SPEED_PRESETS[preset].multiplier === currentSpeed.value
 }

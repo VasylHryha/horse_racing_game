@@ -14,16 +14,16 @@ const { horses } = storeToRefs(raceDataStore)
 const showConfirmGenerateModal = ref(false)
 
 onMounted(() => {
-  raceDataStore.generateNewHorses()
+  raceDataStore.generateHorses()
 })
 
 function generateNewHorses() {
-  raceDataStore.generateNewHorses()
+  raceDataStore.generateHorses()
   showConfirmGenerateModal.value = false
 }
 
 function handleStartRacing() {
-  raceDataStore.generateNewSchedule()
+  raceDataStore.generateSchedule()
   uiControlStore.setScheduleGenerated(true)
   router.push('/race')
 }
