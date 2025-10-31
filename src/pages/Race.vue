@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import HorseList from '@/components/HorseList.vue'
 import RaceHeader from '@/components/layout/RaceHeader.vue'
@@ -25,7 +25,19 @@ const showConfirmHomeModal = ref(false)
 const showHorsesPanel = ref(false)
 
 const { isRacing, isPaused, raceStatus, statusColor } = storeToRefs(uiControlStore)
-const { currentRaceHorses } = storeToRefs(raceDataStore)
+const { currentRaceHorses, horses, schedule } = storeToRefs(raceDataStore)
+
+/**
+ * Page readiness guard:
+ * - we need base horses
+ * - we need a schedule
+ * - and we need the fixed race horses prepared
+ */
+const isRaceSetupReady = computed(() =>
+  horses.value.length > 0
+  && schedule.value.length > 0
+  && currentRaceHorses.value.length > 0,
+)
 
 function handleGoHome() {
   if (isRacing.value || raceDataStore.raceResults.length > 0)
@@ -45,7 +57,8 @@ function goHome() {
 async function handleStartOrPause() {
   if (isRacing.value)
     uiControlStore.togglePause()
-  else await startRace()
+  else
+    await startRace()
 }
 </script>
 
@@ -62,7 +75,8 @@ async function handleStartOrPause() {
       @open-horses="showHorsesPanel = true"
     />
 
-    <div class="max-w-[1600px] mx-auto p-4">
+    <!-- Main race content -->
+    <div v-if="isRaceSetupReady" class="max-w-[1600px] mx-auto p-4">
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-8">
           <RaceTrack />
@@ -75,10 +89,40 @@ async function handleStartOrPause() {
       </div>
     </div>
 
+    <!-- Empty state if stores were cleared (e.g., page reload) -->
+    <div v-else class="max-w-[900px] mx-auto p-6">
+      <div class="bg-white border-2 border-amber-300 rounded-xl p-6 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="text-3xl">
+            ⚠️
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-gray-800 mb-1">
+              Race setup not ready
+            </h2>
+            <p class="text-gray-600">
+              It looks like your race state was reset (e.g., after a page refresh).
+              Please go Home to generate horses and create a new schedule.
+            </p>
+            <div class="mt-4">
+              <button
+                class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold shadow-sm"
+                @click="goHome"
+              >
+                ← Go Home & Prepare Race
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide-over: Race Horses (left) -->
     <SlideOver v-model="showHorsesPanel" title="Race Horses" width-class="w-[420px]">
       <HorseList :horses="currentRaceHorses" title="Race Horses" />
     </SlideOver>
 
+    <!-- Confirmation Modal -->
     <ConfirmModal
       v-if="showConfirmHomeModal"
       :show="showConfirmHomeModal"

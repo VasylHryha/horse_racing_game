@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import type { Ref } from 'vue'
 
 type Size = 'sm' | 'md'
 
@@ -8,17 +8,11 @@ const props = defineProps<{
   title: string // main header text
   subtitle?: string // optional muted text on the right of title
   icon?: string // simple emoji or small text icon (optional)
-  modelValue?: boolean // v-model (open state)
   disabled?: boolean
   size?: Size // visual density
 }>()
 
-const emit = defineEmits<{ (e: 'update:modelValue', v: boolean): void }>()
-
-const isOpen = computed({
-  get: () => !!props.modelValue,
-  set: (v: boolean) => emit('update:modelValue', v),
-})
+const isOpen = defineModel() as Ref<boolean>
 
 function toggle() {
   if (!props.disabled)
