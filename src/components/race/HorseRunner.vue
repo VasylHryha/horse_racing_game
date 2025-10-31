@@ -41,12 +41,13 @@ const medalEmoji = computed(() => {
     >
       <div class="relative">
         <!-- Horse emoji (flipped to face finish line on the right) -->
-        <span class="text-2xl inline-block" style="transform: scaleX(-1);">🏇</span>
+        <span class="text-2xl inline-block" style="transform: scaleX(-1);" aria-hidden="true">🏇</span>
 
         <!-- Horse color indicator -->
         <div
           class="w-3 h-3 rounded-full absolute -bottom-1 left-1/2 -translate-x-1/2 border-2 border-white"
           :style="{ backgroundColor: horse.color }"
+          aria-hidden="true"
         />
 
         <!-- Medal/Trophy for finished horses -->
@@ -74,7 +75,7 @@ const medalEmoji = computed(() => {
     </div>
 
     <!-- Horse name tooltip on hover -->
-    <div class="absolute left-0 top-0 opacity-0 hover:opacity-100 transition-opacity bg-black/75 text-white text-xs px-2 py-1 rounded pointer-events-none">
+    <div class="absolute left-0 top-0 opacity-0 hover:opacity-100 transition-opacity bg-black/75 text-white text-xs px-2 py-1 rounded pointer-events-none" aria-hidden="true">
       {{ horse.name }} ({{ horse.condition }})
     </div>
   </div>

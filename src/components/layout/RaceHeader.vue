@@ -34,8 +34,11 @@ const emit = defineEmits<{
           </h1>
           <span
             data-testid="race-status-badge"
-            class="px-4 py-1.5 rounded-full text-white text-sm font-bold shadow-md"
-            :class="statusClass"
+            class="px-4 py-1.5 rounded-full text-sm font-bold shadow-md"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            :class="[statusClass, props.status === 'PAUSED' ? 'text-black' : 'text-white']"
           >
             {{ status }}
           </span>

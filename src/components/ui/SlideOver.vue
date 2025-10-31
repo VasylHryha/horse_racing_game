@@ -42,6 +42,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
     v-show="open"
     class="fixed inset-0 z-50 flex items-stretch outline-none"
     aria-modal="true"
+    :open="open"
   >
     <transition
       enter-active-class="transform transition ease-out duration-200"
@@ -59,7 +60,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
         style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);"
       >
         <header class="px-4 py-3 border-b flex items-center justify-between shrink-0">
-          <h3 class="font-semibold text-gray-800 truncate">
+          <h3 id="slideover-title" class="font-semibold text-gray-800 truncate">
             {{ title }}
           </h3>
           <button
@@ -73,7 +74,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
         </header>
 
         <!-- Make only the content scroll, keep header fixed -->
-        <div class="flex-1 overflow-auto p-3 overscroll-contain">
+        <div class="flex-1 overflow-auto p-3 overscroll-contain" :aria-labelledby="title ? 'slideover-title' : undefined">
           <slot />
         </div>
       </section>
