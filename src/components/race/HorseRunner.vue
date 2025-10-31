@@ -40,8 +40,8 @@ const medalEmoji = computed(() => {
       :style="{ left: `${progress * 100}%` }"
     >
       <div class="relative">
-        <!-- Horse emoji -->
-        <span class="text-2xl">🏇</span>
+        <!-- Horse emoji (flipped to face finish line on the right) -->
+        <span class="text-2xl inline-block" style="transform: scaleX(-1);">🏇</span>
 
         <!-- Horse color indicator -->
         <div

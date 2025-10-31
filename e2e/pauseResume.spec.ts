@@ -4,35 +4,35 @@ test.describe('Pause and Resume', () => {
   // Helper: navigate to race page
   async function goToRace(page: any) {
     await page.goto('/')
-    await page.getByRole('button', { name: 'Start Racing →' }).click()
+    await page.getByTestId('btn-start-racing').click()
     await expect(page).toHaveURL(/.*\/race/)
   }
 
   test('pauses race and then resumes it', async ({ page }) => {
     await goToRace(page)
-    const startButton = page.locator('button', { hasText: /START RACE|PAUSE|RESUME/ })
+    const startButton = page.getByTestId('race-ctrl')
     await startButton.click()
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible({ timeout: 5000 })
-    // Pause (button label includes an emoji, so match the text substring)
-    await page.getByRole('button', { name: /PAUSE/ }).click()
-    await expect(page.locator('span').filter({ hasText: 'PAUSED' })).toBeVisible()
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
+    // Pause
+    await startButton.click()
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/PAUSED/)
     // Resume
-    await page.getByRole('button', { name: /RESUME/ }).click()
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible()
+    await startButton.click()
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
   })
 
   test('allows multiple pause/resume cycles', async ({ page }) => {
     await goToRace(page)
-    const startButton = page.locator('button', { hasText: /START RACE|PAUSE|RESUME/ })
+    const startButton = page.getByTestId('race-ctrl')
     await startButton.click()
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible({ timeout: 5000 })
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
 
     // Perform three pause/resume toggles
     for (let i = 0; i < 3; i++) {
-      await page.getByRole('button', { name: /PAUSE/ }).click()
-      await expect(page.locator('span').filter({ hasText: 'PAUSED' })).toBeVisible()
-      await page.getByRole('button', { name: /RESUME/ }).click()
-      await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible()
+      await startButton.click()
+      await expect(page.getByTestId('race-status-badge')).toHaveText(/PAUSED/)
+      await startButton.click()
+      await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
     }
   })
 })

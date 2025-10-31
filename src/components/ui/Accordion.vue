@@ -24,6 +24,7 @@ function toggle() {
   <section class="bg-white rounded-lg shadow-md overflow-hidden" :aria-disabled="disabled || undefined">
     <h3 class="m-0">
       <button
+        :data-testid="`accordion-${id}-header`"
         type="button"
         class="w-full flex items-center justify-between focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition"
         :class="size === 'sm' ? 'px-3 py-2' : 'px-4 py-3'"
@@ -64,7 +65,13 @@ function toggle() {
       leave-from-class="max-h-96 opacity-100"
       leave-to-class="max-h-0 opacity-0"
     >
-      <div v-show="isOpen" :id="`${id}-panel`" class="border-t border-gray-200" :class="size === 'sm' ? 'p-2' : 'p-3'">
+      <div
+        v-show="isOpen"
+        :id="`${id}-panel`"
+        :data-testid="`accordion-${id}-panel`"
+        class="border-t border-gray-200"
+        :class="size === 'sm' ? 'p-2' : 'p-3'"
+      >
         <slot />
       </div>
     </transition>

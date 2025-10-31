@@ -118,7 +118,7 @@ async function handleStartOrPause() {
     </div>
 
     <!-- Slide-over: Race Horses (left) -->
-    <SlideOver v-model="showHorsesPanel" title="Race Horses" width-class="w-[420px]">
+    <SlideOver v-model="showHorsesPanel" title="Race Horses" width-class="w-[420px]" test-id="horses-slideover">
       <HorseList :horses="currentRaceHorses" title="Race Horses" />
     </SlideOver>
 

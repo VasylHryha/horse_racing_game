@@ -5,10 +5,12 @@ withDefaults(defineProps<{
   title?: string
   widthClass?: string // e.g. 'w-[380px]'
   closeOnOverlay?: boolean
+  testId?: string
 }>(), {
   title: '',
   widthClass: 'w-[380px]',
   closeOnOverlay: true,
+  testId: undefined,
 })
 
 const open = defineModel<boolean>()
@@ -53,6 +55,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
         v-show="open"
         class="bg-white shadow-2xl border-r border-gray-200 flex flex-col h-dvh max-h-dvh"
         :class="widthClass"
+        :data-testid="testId"
         style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);"
       >
         <header class="px-4 py-3 border-b flex items-center justify-between shrink-0">

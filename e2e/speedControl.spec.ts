@@ -4,14 +4,14 @@ test.describe('Speed Control', () => {
   // Helper: navigate to race page
   async function goToRace(page: any) {
     await page.goto('/')
-    await page.getByRole('button', { name: 'Start Racing →' }).click()
+    await page.getByTestId('btn-start-racing').click()
     await expect(page).toHaveURL(/\/race$/)
   }
 
   test('expand/collapse speed control on race page', async ({ page }) => {
     await goToRace(page)
     // Expand then collapse the accordion; assert aria-expanded toggles
-    const speedHeader = page.getByRole('button', { name: /^Speed/ }).first()
+    const speedHeader = page.getByTestId('speed-accordion').getByRole('button')
     await expect(speedHeader).toHaveAttribute('aria-expanded', 'false')
     await speedHeader.click()
     await expect(speedHeader).toHaveAttribute('aria-expanded', 'true')
@@ -22,7 +22,7 @@ test.describe('Speed Control', () => {
 
   test('change speed before race, disabled during race', async ({ page }) => {
     await goToRace(page)
-    const speedHeader = page.getByRole('button', { name: /^Speed/ }).first()
+    const speedHeader = page.getByTestId('speed-accordion').getByRole('button')
     await speedHeader.click()
     await expect(page.getByText('Slowest')).toBeVisible()
 
@@ -30,9 +30,9 @@ test.describe('Speed Control', () => {
     await page.getByText('Fastest').click()
 
     // Start race
-    const startButton = page.locator('button').filter({ hasText: /START RACE|PAUSE|RESUME/ })
+    const startButton = page.getByTestId('race-ctrl')
     await startButton.click()
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible({ timeout: 5000 })
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
 
     // Inputs should be disabled during race
     const input = page.locator('input#speed-NORMAL')

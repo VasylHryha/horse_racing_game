@@ -46,6 +46,7 @@ function isActive(preset: SpeedPreset) {
     title="Speed"
     :subtitle="currentSpeedLabel"
     size="sm"
+    data-testid="speed-accordion"
   >
     <fieldset class="grid grid-cols-1 gap-2 sm:grid-cols-2" :aria-disabled="disabled">
       <legend class="sr-only">

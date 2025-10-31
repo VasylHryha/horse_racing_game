@@ -4,7 +4,7 @@ test.describe('Complete Race Flow', () => {
   // Helper: navigate from Home to the Race page
   async function goToRace(page: any) {
     await page.goto('/')
-    await page.getByRole('button', { name: 'Start Racing →' }).click()
+    await page.getByTestId('btn-start-racing').click()
     await expect(page).toHaveURL(/\/race$/)
   }
 
@@ -12,56 +12,58 @@ test.describe('Complete Race Flow', () => {
     // Home UI expectations
     await page.goto('/')
     await expect(page.getByRole('heading', { name: /Horse Racing/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Generate New Horses' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Start Racing →' })).toBeVisible()
+    await expect(page.getByTestId('btn-generate-horses')).toBeVisible()
+    await expect(page.getByTestId('btn-start-racing')).toBeVisible()
 
     // Navigate to race
-    await page.getByRole('button', { name: 'Start Racing →' }).click()
+    await page.getByTestId('btn-start-racing').click()
     await expect(page).toHaveURL(/\/race$/)
     // Status badge shows IDLE initially
-    await expect(page.locator('span').filter({ hasText: 'IDLE' })).toBeVisible()
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/IDLE/)
   })
 
   test('starts race and updates status badge', async ({ page }) => {
     await goToRace(page)
     // Start via header button (label flips between START RACE/PAUSE/RESUME)
-    const startButton = page.locator('button').filter({ hasText: /START RACE|PAUSE|RESUME/ })
+    const startButton = page.getByTestId('race-ctrl')
     await startButton.click()
     // Status changes to RACING
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible({ timeout: 5000 })
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
   })
 
   test('pause and resume during race', async ({ page }) => {
     await goToRace(page)
-    const startButton = page.locator('button').filter({ hasText: /START RACE|PAUSE|RESUME/ })
+    const startButton = page.getByTestId('race-ctrl')
     await startButton.click()
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible({ timeout: 5000 })
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
     // Pause toggles to PAUSED
-    const pauseButton = page.locator('button').filter({ hasText: 'PAUSE' })
-    await pauseButton.click()
-    await expect(page.locator('span').filter({ hasText: 'PAUSED' })).toBeVisible()
+    await startButton.click()
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/PAUSED/)
     // Resume returns to RACING
-    const resumeButton = page.locator('button').filter({ hasText: 'RESUME' })
-    await resumeButton.click()
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible()
+    await startButton.click()
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
   })
 
   test('expand Speed section on race page', async ({ page }) => {
     await goToRace(page)
     // Expand the accordion and expect presets to be visible
-    const speedHeader = page.locator('button').filter({ hasText: /^Speed/ }).first()
-    await speedHeader.click()
-    await page.waitForTimeout(250)
+    const speed = page.getByTestId('speed-accordion').getByRole('button')
+    await speed.click()
+    await expect(speed).toHaveAttribute('aria-expanded', 'true')
     await expect(page.getByText('Slowest')).toBeVisible()
   })
 
   test('results panel becomes visible after progress', async ({ page }) => {
     test.setTimeout(60000)
     await goToRace(page)
-    const startButton = page.locator('button').filter({ hasText: /START RACE|PAUSE|RESUME/ })
+    const startButton = page.getByTestId('race-ctrl')
     await startButton.click()
-    // After some time, expect the Results accordion to be present
-    await expect(page.locator('span').filter({ hasText: 'RACING' })).toBeVisible({ timeout: 5000 })
-    await expect(page.getByText('Results', { exact: false })).toBeVisible({ timeout: 30000 })
+    // After some time, expect the Results accordion to show rows
+    await expect(page.getByTestId('race-status-badge')).toHaveText(/RACING/)
+    // Wait for first results item and assert a row content
+    await expect(page.getByTestId('results-item').first()).toBeVisible({ timeout: 30000 })
+    const firstRow = page.getByTestId('results-row').first()
+    await expect(firstRow).toContainText(/🥇|\b[1-3]\b/)
+    await expect(firstRow).toContainText(/[A-Z]/i)
   })
 })

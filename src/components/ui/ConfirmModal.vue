@@ -25,12 +25,12 @@ const emit = defineEmits<{
     <Transition name="modal">
       <dialog
         v-if="show"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        class="fixed inset-0 z-50 flex items-center justify-center"
         aria-modal="true"
         data-testid="confirm-modal"
         @click.self="emit('cancel')"
       >
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+        <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
           <!-- Header -->
           <h3 class="text-xl font-bold text-gray-800 mb-4">
             {{ title }}
@@ -45,12 +45,14 @@ const emit = defineEmits<{
           <div class="flex gap-3 justify-end">
             <button
               class="px-4 py-2 border-2 border-gray-300 rounded font-semibold hover:bg-gray-50 transition"
+              data-testid="confirm-cancel"
               @click="emit('cancel')"
             >
               {{ cancelText }}
             </button>
             <button
               :class="`px-4 py-2 text-white rounded font-semibold transition ${confirmClass}`"
+              data-testid="confirm-accept"
               @click="emit('confirm')"
             >
               {{ confirmText }}

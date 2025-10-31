@@ -41,7 +41,8 @@ export function useRaceController() {
         () => ui.isPaused,
       )
 
-      if (i < TOTAL_ROUNDS - 1) {
+      // Only clear animation state if there is an actual next round in the schedule
+      if (i < raceData.schedule.length - 1) {
         anim.clearRaceState()
         await new Promise(r => setTimeout(r, 2000))
       }

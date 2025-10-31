@@ -13,6 +13,7 @@ function hasEffectiveSpeed(h: Horse): h is RaceHorse {
 export interface UseRaceSimulation {
   raceState: Ref<RaceState | null>
   isAnimating: Ref<boolean>
+  getHorsesWithSpeed: (horses: Horse[]) => Record<number, number>
   simulateRace: (
     round: Round, // expects horses with .effectiveSpeed set
     speedMultiplier: number,
@@ -61,10 +62,11 @@ export function useRaceSimulation(): UseRaceSimulation {
     distance: number,
     finishTimes: Map<number, number>,
     positions: Map<number, HorsePosition>,
+    speedById: Map<number, number>,
   ) => {
     positions.clear()
     for (const horse of horses) {
-      const eff = hasEffectiveSpeed(horse) ? horse.effectiveSpeed : 0
+      const eff = hasEffectiveSpeed(horse) ? horse.effectiveSpeed : (speedById.get(horse.id) ?? 0)
       let dist = eff * simTime
       let progress = dist / distance
       let finished = false
@@ -126,14 +128,23 @@ export function useRaceSimulation(): UseRaceSimulation {
 
   const isComplete = (finishTimes: Map<number, number>, total: number) => finishTimes.size === total
 
-  const buildFinalRankings = (positions: Record<number, HorsePosition>, horses: Horse[]) => {
+  const buildFinalRankings = (positions: Record<number, HorsePosition>, horses: Horse[], speedById: Map<number, number>) => {
     const list = RankingCalculator.calculateFinalRankings(positions, horses)
-    const speedById = new Map<number, number>()
-    for (const h of horses) {
-      speedById.set(h.id, hasEffectiveSpeed(h) ? h.effectiveSpeed : 0)
-    }
     for (const r of list) r.speed = speedById.get(r.horseId) ?? 0
     return list
+  }
+
+  // Produce a speed map for horses based on condition (and optional jitter)
+  const getHorsesWithSpeed = (horses: Horse[]) => {
+    const speeds: Record<number, number> = {}
+    for (const h of horses) {
+      const cond = Math.max(1, Math.min(100, (h as any).condition ?? 50))
+      // Base between ~8..20 scaled by condition; add small randomness
+      const base = 8 + (cond / 100) * 12
+      const jitter = Math.random() * 1.5 // 0..1.5
+      speeds[h.id] = Math.max(0.1, base + jitter)
+    }
+    return speeds
   }
 
   // ── Main simulate ────────────────────────────────────────────────────────────
@@ -155,6 +166,15 @@ export function useRaceSimulation(): UseRaceSimulation {
     let totalPausedMs = 0
     let pauseStartMs = 0
     const startMs = performance.now()
+
+    // Build a speed map for this run from provided horses
+    const speedById = new Map<number, number>()
+    const speedsRecord = getHorsesWithSpeed(round.horses)
+    for (const h of round.horses) {
+      // Prefer provided effectiveSpeed if present
+      const eff = hasEffectiveSpeed(h) ? h.effectiveSpeed : speedsRecord[h.id]
+      speedById.set(h.id, eff)
+    }
 
     // Abort wiring
     abortController = new AbortController()
@@ -197,12 +217,12 @@ export function useRaceSimulation(): UseRaceSimulation {
 
         const simTime = computeSimTime(startMs, totalPausedMs, speedMul)
 
-        updatePositions(round.horses, simTime, distance, finishTimes, positions)
+        updatePositions(round.horses, simTime, distance, finishTimes, positions, speedById)
         assignRanks(finishTimes, positions)
         emitState(simTime, positions, onProgress)
 
         if (isComplete(finishTimes, round.horses.length)) {
-          const finalRankings = buildFinalRankings(Object.fromEntries(positions), round.horses)
+          const finalRankings = buildFinalRankings(Object.fromEntries(positions), round.horses, speedById)
           onComplete(finalRankings)
           return cleanup()
         }
@@ -214,5 +234,5 @@ export function useRaceSimulation(): UseRaceSimulation {
     })
   }
 
-  return { raceState, isAnimating, simulateRace, abort, reset }
+  return { raceState, isAnimating, getHorsesWithSpeed, simulateRace, abort, reset }
 }

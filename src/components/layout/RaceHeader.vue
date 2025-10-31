@@ -21,6 +21,7 @@ const emit = defineEmits<{
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
           <button
+            data-testid="btn-home"
             class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold transition backdrop-blur-sm"
             @click="emit('home')"
           >
@@ -31,13 +32,18 @@ const emit = defineEmits<{
           <h1 class="text-3xl font-bold text-white">
             {{ props.title ?? '🏇 Race Track' }}
           </h1>
-          <span class="px-4 py-1.5 rounded-full text-white text-sm font-bold shadow-md" :class="statusClass">
+          <span
+            data-testid="race-status-badge"
+            class="px-4 py-1.5 rounded-full text-white text-sm font-bold shadow-md"
+            :class="statusClass"
+          >
             {{ status }}
           </span>
         </div>
 
         <div class="flex items-center gap-3">
           <button
+            data-testid="race-ctrl"
             class="px-6 py-2.5 bg-white text-gray-800 border-2 border-white rounded-lg font-semibold hover:bg-gray-50 transition shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
             :disabled="!canStart && !isRacing"
             @click="emit('startPause')"
@@ -54,6 +60,7 @@ const emit = defineEmits<{
           </button>
 
           <button
+            data-testid="open-horses"
             class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold transition backdrop-blur-sm"
             @click="emit('openHorses')"
           >

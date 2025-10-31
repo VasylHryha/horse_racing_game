@@ -4,7 +4,7 @@ test.describe('Race Horses SlideOver', () => {
   // Helper: navigate to race page
   async function goToRace(page: any) {
     await page.goto('/')
-    await page.getByRole('button', { name: 'Start Racing →' }).click()
+    await page.getByTestId('btn-start-racing').click()
     await expect(page).toHaveURL(/\/race$/)
   }
 
@@ -12,11 +12,15 @@ test.describe('Race Horses SlideOver', () => {
     await goToRace(page)
 
     // Open panel via the header button
-    const openBtn = page.getByRole('button', { name: '🐴 Race Horses' })
+    const openBtn = page.getByTestId('open-horses')
     await openBtn.click()
 
-    // Panel title visible (prefer heading role over text)
-    const title = page.getByRole('heading', { name: /Race Horses/i })
+    // Panel visible via test id and title present
+    const panel = page.getByTestId('horses-slideover')
+    await expect(panel).toBeVisible()
+    // SlideOver header uses <h3>, while HorseList inside also renders a heading.
+    // Disambiguate using heading level.
+    const title = panel.getByRole('heading', { name: /Race Horses/i, level: 3 })
     await expect(title).toBeVisible()
 
     // Close via close button

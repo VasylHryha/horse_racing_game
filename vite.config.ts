@@ -6,15 +6,15 @@ import { defineConfig } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     vue(),
-    vueDevTools(),
-    tailwindcss(),
+    // Avoid enabling Vue DevTools and Tailwind plugin in test mode to prevent side-effects
+    ...(mode === 'test' ? [] : [vueDevTools(), tailwindcss()]),
   ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-})
+}))

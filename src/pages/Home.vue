@@ -71,6 +71,7 @@ function handleStartRacing() {
               🎲 Horse Management
             </h3>
             <button
+              data-testid="btn-generate-horses"
               class="w-full px-6 py-3 bg-purple-500 text-white border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-600 transition shadow-md"
               @click="generateNewHorses"
             >
@@ -87,6 +88,7 @@ function handleStartRacing() {
               🏁 Ready to Race?
             </h3>
             <button
+              data-testid="btn-start-racing"
               class="w-full px-6 py-4 bg-white text-green-600 border-2 border-white rounded-lg font-bold text-lg hover:bg-green-50 transition shadow-md disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               :disabled="horses.length === 0"
               @click="handleStartRacing"
