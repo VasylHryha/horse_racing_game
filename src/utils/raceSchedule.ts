@@ -19,12 +19,3 @@ export function generateSchedule(availableHorses: Horse[]): Round[] {
 
   return schedule
 }
-
-export function validateSchedule(schedule: Round[]): boolean {
-  // Ensure each round has correct number of horses
-  return schedule.every(
-    round =>
-      round.horses.length === HORSES_PER_RACE
-      && round.distance > 0,
-  )
-}

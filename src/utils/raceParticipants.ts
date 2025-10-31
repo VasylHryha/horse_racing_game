@@ -8,8 +8,8 @@ function shuffle<T>(arr: T[], seed?: number): T[] {
   const rnd = seed == null ? Math.random : mulberry32(seed >>> 0)
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rnd() * (i + 1))
-    const t = a[i]
-    a[i] = a[j]
+    const t = a[i] as T
+    a[i] = a[j] as T
     a[j] = t
   }
   return a

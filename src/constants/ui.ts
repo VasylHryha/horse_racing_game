@@ -10,7 +10,4 @@ export const SPEED_PRESETS = {
   FAST: { label: 'Fast', multiplier: 2, icon: '🏃' },
   FASTEST: { label: 'Fastest', multiplier: 4, icon: '🚀' },
 } as const
-
 export type SpeedPreset = keyof typeof SPEED_PRESETS
-
-export const DEFAULT_SPEED: SpeedPreset = 'NORMAL'

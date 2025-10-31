@@ -21,23 +21,6 @@ export function computeEffectiveSpeed(baseSpeed: number, condition: number): num
 }
 
 /**
- * Returns new array with re-rolled condition and effectiveSpeed.
- * horse.speed (baseSpeed) remains unchanged.
- * Deterministic if seed provided.
- */
-export function prepareRaceHorses(horses: Horse[], seed?: number): Horse[] {
-  const rng = seed == null ? Math.random : mulberry32(seed ^ 0xA11CE)
-
-  return horses.map((h, i) => {
-    const r = seed == null ? rng : mulberry32((seed ^ (i + 1) * 0x9E3779B9) >>> 0)
-    const newCondition = rollCondition(r)
-    const effectiveSpeed = computeEffectiveSpeed(h.speed, newCondition)
-
-    return { ...h, condition: newCondition, effectiveSpeed }
-  })
-}
-
-/**
  * Mutates horses with re-rolled condition and effectiveSpeed.
  * horse.speed (baseSpeed) remains unchanged.
  * Deterministic if seed provided.
