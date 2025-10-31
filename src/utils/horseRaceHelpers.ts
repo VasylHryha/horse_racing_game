@@ -46,11 +46,11 @@ export function mutateRaceHorses(horses: Horse[], seed?: number): void {
   const rng = seed == null ? Math.random : mulberry32(seed ^ 0xBADC0DE)
 
   for (let i = 0; i < horses.length; i++) {
-    const h = horses[i]
+    const h = horses[i] as Horse
     const r = seed == null ? rng : mulberry32((seed ^ (i + 1) * 0x85EBCA77) >>> 0)
     const newCondition = rollCondition(r)
 
     h.condition = newCondition
-    ;(h as any).effectiveSpeed = computeEffectiveSpeed(h.speed, newCondition)
+    h.effectiveSpeed = computeEffectiveSpeed(h.speed, newCondition)
   }
 }

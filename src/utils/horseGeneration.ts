@@ -1,6 +1,7 @@
 // horse-utils.ts (or wherever it already lives)
 import type { Horse } from '@/types'
 import { HORSE_COLORS, HORSE_NAMES, HORSE_SPEED, TOTAL_HORSES } from '@/constants'
+import { computeEffectiveSpeed } from '@/utils/horseRaceHelpers.ts'
 import { mulberry32 } from './seedGenerator'
 
 const MIN_CONDITION = 40
@@ -26,6 +27,7 @@ export function generateHorses(): Horse[] {
       color: HORSE_COLORS[i] ?? '#000000',
       condition,
       speed,
+      effectiveSpeed: computeEffectiveSpeed(speed, condition),
     })
   }
   return horses

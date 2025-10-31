@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useRaceAnimationStore } from '@/stores/useRaceAnimationStore'
-import { useRaceDataStore } from '@/stores/useRaceDataStore'
-import { getOrdinalSuffix } from '@/utils/ordinal'
+import { useRaceAnimationStore } from '@/stores/useRaceAnimationStore.ts'
+import { useRaceDataStore } from '@/stores/useRaceDataStore.ts'
+import { getOrdinalSuffix } from '@/utils/ordinal.ts'
 import HorseRunner from './HorseRunner.vue'
 
 const raceDataStore = useRaceDataStore()

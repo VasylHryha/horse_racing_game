@@ -8,7 +8,7 @@ export interface Horse {
   color: string
   condition: number
   speed: number
-
+  effectiveSpeed: number
 }
 
 export interface Round {

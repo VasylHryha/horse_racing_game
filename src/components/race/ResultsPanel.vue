@@ -1,20 +1,29 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { computed, ref } from 'vue'
+import Accordion from '@/components/ui/Accordion.vue'
 import { useRaceDataStore } from '@/stores/useRaceDataStore'
 import { getOrdinalSuffix } from '@/utils/ordinal'
 
 const raceDataStore = useRaceDataStore()
 const { raceResults } = storeToRefs(raceDataStore)
+
+const isOpen = ref(true)
+const subtitle = computed(() => {
+  const n = raceResults.value.length
+  return n ? `${n} result${n === 1 ? '' : 's'}` : 'Waiting…'
+})
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <!-- Header (Green) -->
-    <div class="bg-green-500 text-white px-4 py-3 font-bold text-center">
-      Results
-    </div>
-
-    <!-- Content -->
+  <Accordion
+    id="results"
+    v-model="isOpen"
+    icon="🏁"
+    title="Results"
+    :subtitle="subtitle"
+    size="sm"
+  >
     <div v-if="raceResults.length === 0" class="p-6 text-center text-gray-500 text-sm">
       Results will appear after each race
     </div>
@@ -62,5 +71,5 @@ const { raceResults } = storeToRefs(raceDataStore)
         </table>
       </div>
     </div>
-  </div>
+  </Accordion>
 </template>

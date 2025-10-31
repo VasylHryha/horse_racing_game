@@ -2,7 +2,6 @@
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import ConfirmModal from '@/components/ConfirmModal.vue'
 import HorseList from '@/components/HorseList.vue'
 import { useRaceDataStore } from '@/stores/useRaceDataStore'
 import { useUIControlStore } from '@/stores/useUIControlStore'
@@ -17,15 +16,6 @@ const showConfirmGenerateModal = ref(false)
 onMounted(() => {
   raceDataStore.generateNewHorses()
 })
-
-function handleGenerateHorses() {
-  if (horses.value.length > 0) {
-    showConfirmGenerateModal.value = true
-  }
-  else {
-    generateNewHorses()
-  }
-}
 
 function generateNewHorses() {
   raceDataStore.generateNewHorses()
@@ -65,11 +55,11 @@ function handleStartRacing() {
               <h2 class="text-2xl font-bold text-gray-800">
                 🐴 Your Stable
               </h2>
-              <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
-                {{ horses.length }} horses
-              </span>
+              <!-- Count chip removed; HorseList shows its own count -->
             </div>
-            <HorseList />
+
+            <!-- Pass data explicitly; HorseList is presentational -->
+            <HorseList :horses="horses" title="Horses List" :track-changes="false" />
           </div>
         </div>
 
@@ -82,7 +72,7 @@ function handleStartRacing() {
             </h3>
             <button
               class="w-full px-6 py-3 bg-purple-500 text-white border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-600 transition shadow-md"
-              @click="handleGenerateHorses"
+              @click="generateNewHorses"
             >
               Generate New Horses
             </button>
@@ -123,18 +113,5 @@ function handleStartRacing() {
         </div>
       </div>
     </div>
-
-    <!-- Confirmation Modal -->
-    <ConfirmModal
-      v-if="showConfirmGenerateModal"
-      :show="showConfirmGenerateModal"
-      title="Generate New Horses?"
-      message="This will replace all current horses. Any ongoing races will be lost. Continue?"
-      confirm-text="Generate"
-      cancel-text="Cancel"
-      confirm-class="bg-purple-600 hover:bg-purple-700"
-      @confirm="generateNewHorses"
-      @cancel="showConfirmGenerateModal = false"
-    />
   </div>
 </template>

@@ -1,63 +1,54 @@
+// composables/useRaceController.ts
 import type { RaceResult } from '@/types'
+import { useRaceSimulation } from '@/composables/useRaceSimulation'
 import { TOTAL_ROUNDS } from '@/constants'
 import { useRaceAnimationStore } from '@/stores/useRaceAnimationStore'
 import { useRaceDataStore } from '@/stores/useRaceDataStore'
 import { useUIControlStore } from '@/stores/useUIControlStore'
-import { prepareRaceHorses } from '@/utils/horseRaceHelpers'
-import { useRaceSimulation } from './useRaceSimulation'
 
 export function useRaceController() {
   const { simulateRace, reset } = useRaceSimulation()
-  const raceDataStore = useRaceDataStore()
-  const uiControlStore = useUIControlStore()
-  const raceAnimationStore = useRaceAnimationStore()
+  const raceData = useRaceDataStore()
+  const ui = useUIControlStore()
+  const anim = useRaceAnimationStore()
 
   async function startRace() {
-    uiControlStore.startRace()
+    ui.startRace()
     await runAllRounds()
   }
 
   async function runAllRounds() {
     for (let i = 0; i < TOTAL_ROUNDS; i++) {
-      const round = raceDataStore.schedule[i]
+      const round = raceData.schedule[i]
       if (!round)
         break
 
-      // Prepare horses with fresh condition and effectiveSpeed for this race
-      const preparedRound = {
-        ...round,
-        horses: prepareRaceHorses(round.horses),
-      }
+      // Re-roll same 10 horses for this round (condition + effectiveSpeed)
+      raceData.rerollRaceHorsesForCurrentRound(round.roundNumber)
 
       await simulateRace(
-        preparedRound,
-        uiControlStore.speedMultiplier,
-        (state) => {
-          raceAnimationStore.updateRaceState(state)
-        },
+        { ...round, horses: raceData.currentRaceHorses },
+        ui.speedMultiplier,
+        (state) => { anim.updateRaceState(state) },
         (rankings) => {
           const result: RaceResult = {
             roundNumber: round.roundNumber,
             distance: round.distance,
             rankings,
           }
-          raceDataStore.completeRound(result)
+          raceData.completeRound(result)
         },
-        () => uiControlStore.isPaused,
+        () => ui.isPaused,
       )
 
-      // Clear race state between rounds
       if (i < TOTAL_ROUNDS - 1) {
-        raceAnimationStore.clearRaceState()
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        anim.clearRaceState()
+        await new Promise(r => setTimeout(r, 2000))
       }
     }
 
-    uiControlStore.stopRace()
+    ui.stopRace()
   }
 
-  return {
-    startRace,
-    resetRace: reset,
-  }
+  return { startRace, resetRace: reset }
 }
