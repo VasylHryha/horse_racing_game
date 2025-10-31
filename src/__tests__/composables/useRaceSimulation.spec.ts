@@ -1,12 +1,36 @@
 import type { Horse, HorseRanking, Round } from '@/types'
 import { describe, expect, it } from 'vitest'
 import { useRaceSimulation } from '@/composables/useRaceSimulation'
+import { computeEffectiveSpeed } from '@/utils/horseRaceHelpers'
 
 describe('useRaceSimulation', () => {
+  // Use higher base speed so 1200m race completes under test timeout (5s) with TIME_COMPRESSION
+  const BASE_TEST_SPEED = 24
   const mockHorses: Horse[] = [
-    { id: 1, name: 'Thunder', color: '#FF0000', condition: 95 },
-    { id: 2, name: 'Lightning', color: '#00FF00', condition: 85 },
-    { id: 3, name: 'Storm', color: '#0000FF', condition: 75 },
+    {
+      id: 1,
+      name: 'Thunder',
+      color: '#FF0000',
+      condition: 95,
+      speed: BASE_TEST_SPEED,
+      effectiveSpeed: computeEffectiveSpeed(BASE_TEST_SPEED, 95),
+    },
+    {
+      id: 2,
+      name: 'Lightning',
+      color: '#00FF00',
+      condition: 85,
+      speed: BASE_TEST_SPEED,
+      effectiveSpeed: computeEffectiveSpeed(BASE_TEST_SPEED, 85),
+    },
+    {
+      id: 3,
+      name: 'Storm',
+      color: '#0000FF',
+      condition: 75,
+      speed: BASE_TEST_SPEED,
+      effectiveSpeed: computeEffectiveSpeed(BASE_TEST_SPEED, 75),
+    },
   ]
 
   const mockRound: Round = {
