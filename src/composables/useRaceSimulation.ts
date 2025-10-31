@@ -4,11 +4,7 @@ import { ref } from 'vue'
 import { TIME_COMPRESSION } from '@/constants'
 import { RankingCalculator } from '@/utils/rankingCalculator'
 
-type RaceHorse = Horse & { effectiveSpeed: number }
-
-function hasEffectiveSpeed(h: Horse): h is RaceHorse {
-  return typeof (h as any).effectiveSpeed === 'number'
-}
+// Horses in our domain always have an effectiveSpeed computed.
 
 export interface UseRaceSimulation {
   raceState: Ref<RaceState | null>
@@ -62,11 +58,10 @@ export function useRaceSimulation(): UseRaceSimulation {
     distance: number,
     finishTimes: Map<number, number>,
     positions: Map<number, HorsePosition>,
-    speedById: Map<number, number>,
   ) => {
     positions.clear()
     for (const horse of horses) {
-      const eff = hasEffectiveSpeed(horse) ? horse.effectiveSpeed : (speedById.get(horse.id) ?? 0)
+      const eff = horse.effectiveSpeed
       let dist = eff * simTime
       let progress = dist / distance
       let finished = false
@@ -169,11 +164,9 @@ export function useRaceSimulation(): UseRaceSimulation {
 
     // Build a speed map for this run from provided horses
     const speedById = new Map<number, number>()
-    const speedsRecord = getHorsesWithSpeed(round.horses)
     for (const h of round.horses) {
-      // Prefer provided effectiveSpeed if present
-      const eff = hasEffectiveSpeed(h) ? h.effectiveSpeed : speedsRecord[h.id]
-      speedById.set(h.id, eff)
+      // Use the horse's effectiveSpeed for this run
+      speedById.set(h.id, h.effectiveSpeed)
     }
 
     // Abort wiring
@@ -217,7 +210,7 @@ export function useRaceSimulation(): UseRaceSimulation {
 
         const simTime = computeSimTime(startMs, totalPausedMs, speedMul)
 
-        updatePositions(round.horses, simTime, distance, finishTimes, positions, speedById)
+        updatePositions(round.horses, simTime, distance, finishTimes, positions)
         assignRanks(finishTimes, positions)
         emitState(simTime, positions, onProgress)
 
