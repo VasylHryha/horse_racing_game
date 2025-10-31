@@ -38,7 +38,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
   <!-- Panel -->
   <dialog
     v-show="open"
-    class="fixed inset-y-0 left-0 z-50 flex outline-none"
+    class="fixed inset-0 z-50 flex items-stretch outline-none"
     aria-modal="true"
   >
     <transition
@@ -51,10 +51,11 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
     >
       <section
         v-show="open"
-        class="h-full bg-white shadow-2xl border-r border-gray-200 flex flex-col"
+        class="bg-white shadow-2xl border-r border-gray-200 flex flex-col h-dvh max-h-dvh"
         :class="widthClass"
+        style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);"
       >
-        <header class="px-4 py-3 border-b flex items-center justify-between">
+        <header class="px-4 py-3 border-b flex items-center justify-between shrink-0">
           <h3 class="font-semibold text-gray-800 truncate">
             {{ title }}
           </h3>
@@ -67,12 +68,15 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
             ✕
           </button>
         </header>
-        <div class="flex-1 overflow-auto p-3">
+
+        <!-- Make only the content scroll, keep header fixed -->
+        <div class="flex-1 overflow-auto p-3 overscroll-contain">
           <slot />
         </div>
       </section>
     </transition>
-    <!-- Spacer to keep layout from shifting on scrollbars -->
+
+    <!-- Spacer to keep layout from shifting on scrollbars (kept minimal) -->
     <div aria-hidden="true" class="w-0" />
   </dialog>
 </template>
