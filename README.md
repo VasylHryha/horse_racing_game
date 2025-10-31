@@ -1,5 +1,7 @@
 # Horse Racing Simulator
 
+[![CI](https://github.com/YOUR_USERNAME/horse_racing/workflows/CI/badge.svg)](https://github.com/YOUR_USERNAME/horse_racing/actions)
+
 A Vue 3 + Vite app simulating multi‑round horse races. It uses Pinia for state, Vue Router for navigation, and a small
 set of UI components. Unit tests run on Vitest and E2E on Playwright.
 
@@ -60,6 +62,65 @@ End‑to‑end tests (Playwright):
 - Chromium only: `npm run test:e2e -- --project=chromium`
 - Single file: `npm run test:e2e -- e2e/raceFlow.spec.ts`
 - Debug mode: `npm run test:e2e -- --debug`
+
+## Deployment
+
+### GitHub Pages
+
+This project is configured for automatic deployment to GitHub Pages via GitHub Actions.
+
+**Initial setup:**
+
+1. Enable GitHub Pages in your repository settings:
+   - Navigate to **Settings** → **Pages**
+   - Under **Source**, select **GitHub Actions**
+
+2. Push to the `master` branch to trigger the deployment workflow
+
+3. Your app will be available at:
+   ```
+   https://<your-username>.github.io/<repository-name>/
+   ```
+
+**How it works:**
+
+The deployment is configured across three files:
+
+- **`vite.config.ts`** (lines 10-18): Configures the base path for GitHub Pages
+  - Reads `GH_PAGES_BASE` environment variable during build
+  - Uses `/repository-name/` for production, `/` for development
+  - Ensures proper asset loading on GitHub Pages subdirectory
+
+- **`.github/workflows/gh-pages.yml`**: GitHub Actions workflow
+  - Triggers on push to `master` branch or manual dispatch
+  - Builds the project with correct base path: `GH_PAGES_BASE=/<repo-name>/`
+  - Creates `404.html` from `index.html` for SPA routing fallback
+  - Deploys `dist/` folder to GitHub Pages
+
+- **`playwright.config.ts`** (line 38): Supports E2E testing against deployed site
+  - Can override base URL via `PLAYWRIGHT_BASE_URL` environment variable
+  - Useful for testing the actual deployed application
+
+**Manual deployment:**
+
+You can trigger deployment manually from GitHub:
+- Go to **Actions** tab → **Deploy to GitHub Pages** → **Run workflow**
+
+**Local preview of production build:**
+
+```bash
+npm run build    # Build with production settings
+npm run preview  # Preview on http://localhost:4173
+```
+
+## Testing strategy
+
+- Unit tests focus on logic-heavy surfaces: stores, composables, and utils. Core components that encapsulate logic are also covered.
+- App shell and thin view wrappers are excluded from unit coverage to avoid noisy, low‑value failures:
+  - Excluded from coverage: `src/main.ts`, `src/App.vue`, `src/pages/**`, `src/router/**`, and generic UI wrappers under `src/components/ui/**`.
+  - Rationale: these compose other pieces and are validated by E2E; exercising them with shallow unit tests duplicates Playwright’s responsibility and distorts coverage.
+- E2E tests cover page rendering and primary flows (Home → Race, start/pause/resume, speed control, slide‑over, results, confirmation modal), using stable `data-testid` selectors and state‑based waits (`aria-expanded`, live status) for reliability.
+- Future consideration: Full-file coverage could be achieved by aggregating E2E coverage into reports or adding lightweight component smoke tests for pages/App.
 
 ## App structure
 
