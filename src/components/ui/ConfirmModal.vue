@@ -23,9 +23,11 @@ const emit = defineEmits<{
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div
+      <dialog
         v-if="show"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        aria-modal="true"
+        data-testid="confirm-modal"
         @click.self="emit('cancel')"
       >
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
@@ -55,7 +57,7 @@ const emit = defineEmits<{
             </button>
           </div>
         </div>
-      </div>
+      </dialog>
     </Transition>
   </Teleport>
 </template>

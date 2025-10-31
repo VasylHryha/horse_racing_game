@@ -40,8 +40,8 @@ const subtitle = computed(() => {
     :subtitle="subtitle"
     size="sm"
   >
-    <div v-if="!isScheduleGenerated" class="p-6 text-center text-gray-500">
-      Click "GENERATE PROGRAM" to create schedule
+    <div v-if="!isScheduleGenerated" class="p-6 text-center text-gray-500 text-sm">
+      Start a race from Home to generate the schedule
     </div>
 
     <div v-else class="p-3 space-y-2 max-h-[350px] overflow-y-auto">
