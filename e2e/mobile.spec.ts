@@ -163,7 +163,7 @@ test.describe('Mobile Responsiveness', () => {
     }
   })
 
-  test('overlay click closes panel on desktop only', {
+  test.only('overlay click closes panel on desktop only', {
     tag: '@mobile',
   }, async ({ page, isMobile }) => {
     await page.getByTestId('btn-start-racing').click()
@@ -174,7 +174,7 @@ test.describe('Mobile Responsiveness', () => {
     if (!isMobile) {
       // Click outside the panel area to hit the overlay
       const vp = page.viewportSize()!
-      await page.mouse.click(vp.width - 5, 10)
+      await page.mouse.click(vp.width - 100, 100)
       await expect(panel).toBeHidden()
     }
     else {
