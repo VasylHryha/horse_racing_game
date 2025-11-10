@@ -163,7 +163,7 @@ test.describe('Mobile Responsiveness', () => {
     }
   })
 
-  test.only('overlay click closes panel on desktop only', {
+  test('overlay click closes panel on desktop only', {
     tag: '@mobile',
   }, async ({ page, isMobile }) => {
     await page.getByTestId('btn-start-racing').click()
