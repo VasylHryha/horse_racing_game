@@ -47,7 +47,7 @@ watch(() => props.show, async (open) => {
         <!-- modal -->
         <dialog
           ref="containerRef"
-          class="relative bg-white rounded-lg max-w-md w-[calc(100vw-2rem)] mx-4 p-6 shadow-xl outline-none"
+          class="relative bg-white rounded-lg max-w-md w-[calc(100vw-2rem)] mx-4 p-4 sm:p-6 shadow-xl outline-none"
           aria-modal="true"
           :aria-labelledby="titleId"
           :aria-describedby="descId"
@@ -56,17 +56,17 @@ watch(() => props.show, async (open) => {
           data-testid="confirm-modal"
           @keydown.esc.prevent.stop="emit('cancel')"
         >
-          <h3 :id="titleId" class="text-xl font-bold text-gray-800 mb-4">
+          <h3 :id="titleId" class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">
             {{ title }}
           </h3>
 
-          <p :id="descId" class="text-gray-600 mb-6">
+          <p :id="descId" class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
             {{ message }}
           </p>
 
-          <div class="flex gap-3 justify-end">
+          <div class="flex gap-2 sm:gap-3 justify-end">
             <button
-              class="px-4 py-2 border-2 border-gray-300 rounded font-semibold hover:bg-gray-50 transition"
+              class="px-3 sm:px-4 py-2 border-2 border-gray-300 rounded font-semibold hover:bg-gray-50 transition text-sm sm:text-base"
               data-testid="confirm-cancel"
               autofocus
               @click="emit('cancel')"
@@ -74,7 +74,7 @@ watch(() => props.show, async (open) => {
               {{ cancelText }}
             </button>
             <button
-              :class="`px-4 py-2 text-white rounded font-semibold transition ${confirmClass}`"
+              :class="`px-3 sm:px-4 py-2 text-white rounded font-semibold transition text-sm sm:text-base ${confirmClass}`"
               data-testid="confirm-accept"
               @click="emit('confirm')"
             >

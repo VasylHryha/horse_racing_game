@@ -34,11 +34,11 @@ const deltaText = computed(() => `${delta.value > 0 ? '+' : ''}${delta.value}`)
     class="border-b border-yellow-200 hover:bg-yellow-50 transition"
     :class="[highlight ? 'bg-yellow-300 font-bold' : '']"
   >
-    <td class="p-2">
+    <td class="p-1.5 sm:p-2">
       {{ horse.name }}
     </td>
 
-    <td class="p-2 text-center">
+    <td class="p-1.5 sm:p-2 text-center">
       <div class="inline-flex items-center justify-center gap-1">
         <template v-if="trackChanges">
           <span
@@ -63,9 +63,9 @@ const deltaText = computed(() => `${delta.value > 0 ? '+' : ''}${delta.value}`)
       </div>
     </td>
 
-    <td class="p-2 text-center">
+    <td class="p-1.5 sm:p-2 text-center">
       <div
-        class="w-4 h-4 rounded-full mx-auto border border-gray-400"
+        class="w-4 h-4 sm:w-5 sm:h-5 rounded-full mx-auto border border-gray-400"
         :style="{ backgroundColor: horse.color }"
       />
     </td>

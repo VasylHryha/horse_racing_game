@@ -76,12 +76,12 @@ async function handleStartOrPause() {
     />
 
     <!-- Main race content -->
-    <div v-if="isRaceSetupReady" class="max-w-[1600px] mx-auto p-4">
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-8">
+    <div v-if="isRaceSetupReady" class="max-w-[1600px] mx-auto p-2 sm:p-4">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+        <div class="col-span-1 md:col-span-8">
           <RaceTrack />
         </div>
-        <div class="col-span-4 space-y-4">
+        <div class="col-span-1 md:col-span-4 space-y-3 md:space-y-4">
           <SpeedControl />
           <RaceSchedule />
           <RaceResults />
@@ -118,7 +118,7 @@ async function handleStartOrPause() {
     </div>
 
     <!-- Slide-over: Race Horses (left) -->
-    <SlideOver v-model="showHorsesPanel" title="Race Horses" width-class="w-[420px]" test-id="horses-slideover">
+    <SlideOver v-model="showHorsesPanel" title="Race Horses" width-class="w-full max-w-md" test-id="horses-slideover">
       <HorseList :horses="currentRaceHorses" title="Race Horses" />
     </SlideOver>
 

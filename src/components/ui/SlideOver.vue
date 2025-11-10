@@ -3,12 +3,12 @@ import { onBeforeUnmount, onMounted } from 'vue'
 
 withDefaults(defineProps<{
   title?: string
-  widthClass?: string // e.g. 'w-[380px]'
+  widthClass?: string // e.g. 'w-[380px]' or 'w-full max-w-md'
   closeOnOverlay?: boolean
   testId?: string
 }>(), {
   title: '',
-  widthClass: 'w-[380px]',
+  widthClass: 'w-full max-w-sm',
   closeOnOverlay: true,
   testId: undefined,
 })

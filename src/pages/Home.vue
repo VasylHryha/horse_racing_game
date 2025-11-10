@@ -33,12 +33,12 @@ function handleStartRacing() {
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
     <!-- Header -->
     <div class="bg-white border-b-4 border-indigo-200 shadow-md">
-      <div class="max-w-5xl mx-auto px-6 py-8">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <div class="text-center">
-          <h1 class="text-5xl font-bold text-gray-800 mb-2">
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-2">
             🏇 Horse Racing Simulator
           </h1>
-          <p class="text-gray-600 text-lg">
+          <p class="text-gray-600 text-sm sm:text-base md:text-lg">
             Manage your horses and start racing!
           </p>
         </div>
@@ -46,13 +46,13 @@ function handleStartRacing() {
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-5xl mx-auto px-6 py-8">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <!-- Horse List Card -->
         <div class="lg:col-span-2">
-          <div class="bg-white rounded-lg shadow-lg p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-2xl font-bold text-gray-800">
+          <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div class="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 class="text-xl sm:text-2xl font-bold text-gray-800">
                 🐴 Your Stable
               </h2>
               <!-- Count chip removed; HorseList shows its own count -->
@@ -64,48 +64,48 @@ function handleStartRacing() {
         </div>
 
         <!-- Actions Card -->
-        <div class="space-y-6">
+        <div class="space-y-4 sm:space-y-6">
           <!-- Generate Horses -->
-          <div class="bg-white rounded-lg shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">
+          <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4">
               🎲 Horse Management
             </h3>
             <button
               data-testid="btn-generate-horses"
-              class="w-full px-6 py-3 bg-purple-500 text-white border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-600 transition shadow-md"
+              class="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-purple-500 text-white border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-600 transition shadow-md text-sm sm:text-base"
               @click="generateNewHorses"
             >
               Generate New Horses
             </button>
-            <p class="text-sm text-gray-500 mt-2">
+            <p class="text-xs sm:text-sm text-gray-500 mt-2">
               Create a fresh set of horses with random stats
             </p>
           </div>
 
           <!-- Start Racing -->
-          <div class="bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg shadow-lg p-6 text-white">
-            <h3 class="text-lg font-bold mb-4">
+          <div class="bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg shadow-lg p-4 sm:p-6 text-white">
+            <h3 class="text-base sm:text-lg font-bold mb-3 sm:mb-4">
               🏁 Ready to Race?
             </h3>
             <button
               data-testid="btn-start-racing"
-              class="w-full px-6 py-4 bg-white text-green-600 border-2 border-white rounded-lg font-bold text-lg hover:bg-green-50 transition shadow-md disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              class="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white text-green-600 border-2 border-white rounded-lg font-bold text-base sm:text-lg hover:bg-green-50 transition shadow-md disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               :disabled="horses.length === 0"
               @click="handleStartRacing"
             >
               Start Racing →
             </button>
-            <p class="text-sm mt-3 opacity-90">
+            <p class="text-xs sm:text-sm mt-2 sm:mt-3 opacity-90">
               Generate a race schedule and begin!
             </p>
           </div>
 
           <!-- Info Card -->
-          <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-            <h4 class="font-semibold text-blue-900 mb-2">
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 sm:p-4">
+            <h4 class="font-semibold text-blue-900 mb-2 text-sm sm:text-base">
               ℹ️ How it works
             </h4>
-            <ul class="text-sm text-blue-800 space-y-1">
+            <ul class="text-xs sm:text-sm text-blue-800 space-y-1">
               <li>• Generate horses with unique stats</li>
               <li>• Each race uses random conditions</li>
               <li>• Watch multiple rounds sequentially</li>

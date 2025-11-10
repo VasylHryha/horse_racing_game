@@ -29,28 +29,28 @@ const subtitle = computed(() => {
     size="sm"
     data-testid="results-accordion"
   >
-    <div v-if="raceResults.length === 0" class="p-6 text-center text-gray-500 text-sm" data-testid="results-empty">
+    <div v-if="raceResults.length === 0" class="p-4 sm:p-6 text-center text-gray-500 text-xs sm:text-sm" data-testid="results-empty">
       Results will appear after each race
     </div>
 
-    <div v-else class="p-3 space-y-3 max-h-[350px] overflow-y-auto" data-testid="results-list">
+    <div v-else class="p-2 sm:p-3 space-y-2 sm:space-y-3 max-h-[300px] sm:max-h-[350px] overflow-y-auto" data-testid="results-list">
       <div
         v-for="result in raceResults"
         :key="result.roundNumber"
-        class="border-2 border-green-400 rounded p-2"
+        class="border-2 border-green-400 rounded p-1.5 sm:p-2"
         data-testid="results-item"
       >
-        <div class="bg-green-100 px-2 py-1 rounded mb-2 text-xs font-semibold">
+        <div class="bg-green-100 px-2 py-1 rounded mb-1.5 sm:mb-2 text-[10px] sm:text-xs font-semibold">
           {{ getOrdinalSuffix(result.roundNumber) }} Lap {{ result.distance }}m
         </div>
 
-        <table class="w-full text-xs" data-testid="results-table">
+        <table class="w-full text-[10px] sm:text-xs" data-testid="results-table">
           <thead class="border-b">
             <tr>
-              <th class="text-left p-1">
+              <th class="text-left p-0.5 sm:p-1">
                 Position
               </th>
-              <th class="text-left p-1">
+              <th class="text-left p-0.5 sm:p-1">
                 Name
               </th>
             </tr>
@@ -67,10 +67,10 @@ const subtitle = computed(() => {
               }"
               data-testid="results-row"
             >
-              <td class="p-1">
+              <td class="p-0.5 sm:p-1">
                 {{ idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : ranking.position }}
               </td>
-              <td class="p-1">
+              <td class="p-0.5 sm:p-1 truncate">
                 {{ ranking.name }}
               </td>
             </tr>
