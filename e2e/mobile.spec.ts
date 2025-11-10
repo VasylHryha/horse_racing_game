@@ -82,7 +82,7 @@ test.describe('Mobile Responsiveness', () => {
     await expect(raceTrack).toBeVisible()
 
     // Verify the track has horizontal scroll capability
-    const isScrollable = await raceTrack.evaluate((el) => el.scrollWidth > el.clientWidth)
+    const isScrollable = await raceTrack.evaluate(el => el.scrollWidth > el.clientWidth)
 
     // On mobile (Pixel 5 is 393px wide), the 520px track should be scrollable
     expect(isScrollable).toBeTruthy()
@@ -176,7 +176,8 @@ test.describe('Mobile Responsiveness', () => {
       const vp = page.viewportSize()!
       await page.mouse.click(vp.width - 5, 10)
       await expect(panel).toBeHidden()
-    } else {
+    }
+    else {
       // On mobile the panel fills the screen — overlay click is not viable
       await expect(panel).toBeVisible()
     }

@@ -12,6 +12,8 @@
     "preview": "vite preview",
     "test:unit": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:mobile": "playwright test --project=\"Mobile Chrome\"",
+    "test:e2e:desktop": "playwright test --project=chromium",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint",

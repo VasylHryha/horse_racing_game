@@ -58,8 +58,10 @@ Unit tests (Vitest):
 End‑to‑end tests (Playwright):
 
 - First time, install browsers: `npx playwright install`
-- Run all: `npm run test:e2e`
-- Chromium only: `npm run test:e2e -- --project=chromium`
+- Desktop tests: `npm run test:e2e:desktop` (Chromium) - **used in CI/CD**
+- Mobile tests: `npm run test:e2e:mobile` (Pixel 5 viewport) - **used in CI/CD**
+- All projects: `npm run test:e2e` (chromium, firefox, webkit, Mobile Chrome)
+- Single project: `npm run test:e2e -- --project=firefox`
 - Single file: `npm run test:e2e -- e2e/raceFlow.spec.ts`
 - Debug mode: `npm run test:e2e -- --debug`
 
@@ -86,7 +88,7 @@ This project is configured for automatic deployment to GitHub Pages via GitHub A
 
 The deployment is configured across three files:
 
-- **`vite.config.ts`** (lines 10-18): Configures the base path for GitHub Pages
+- **`vite.config.ts`**: Configures the base path for GitHub Pages
   - Reads `GH_PAGES_BASE` environment variable during build
   - Uses `/repository-name/` for production, `/` for development
   - Ensures proper asset loading on GitHub Pages subdirectory
@@ -97,7 +99,7 @@ The deployment is configured across three files:
   - Creates `404.html` from `index.html` for SPA routing fallback
   - Deploys `dist/` folder to GitHub Pages
 
-- **`playwright.config.ts`** (line 38): Supports E2E testing against deployed site
+- **`playwright.config.ts`**: Supports E2E testing against deployed site
   - Can override base URL via `PLAYWRIGHT_BASE_URL` environment variable
   - Useful for testing the actual deployed application
 
@@ -118,8 +120,32 @@ npm run preview  # Preview on http://localhost:4173
 - Unit tests focus on logic-heavy surfaces: stores, composables, and utils. Core components that encapsulate logic are also covered.
 - App shell and thin view wrappers are excluded from unit coverage to avoid noisy, low‑value failures:
   - Excluded from coverage: `src/main.ts`, `src/App.vue`, `src/pages/**`, `src/router/**`, and generic UI wrappers under `src/components/ui/**`.
-  - Rationale: these compose other pieces and are validated by E2E; exercising them with shallow unit tests duplicates Playwright’s responsibility and distorts coverage.
+  - Rationale: these compose other pieces and are validated by E2E; exercising them with shallow unit tests duplicates Playwright's responsibility and distorts coverage.
 - E2E tests cover page rendering and primary flows (Home → Race, start/pause/resume, speed control, slide‑over, results, confirmation modal), using stable `data-testid` selectors and state‑based waits (`aria-expanded`, live status) for reliability.
+
+### Mobile Responsive Testing
+
+The app uses extensive mobile-responsive CSS (90+ responsive breakpoints across 11 components) with Tailwind's `sm:`, `md:`, `lg:` utilities. Mobile and desktop have different layouts, styling, and UX patterns.
+
+**Testing approach:**
+- **All tests run on both desktop and mobile viewports** to verify responsive behavior works correctly across screen sizes
+- **Desktop tests (Chromium)** verify that mobile-responsive styles scale up properly and don't break wide layouts
+- **Mobile tests (Pixel 5 viewport)** verify that mobile-specific layouts, touch targets, and viewport-constrained features work correctly
+- **Viewport-specific tests** use `test.skip(!isMobile)` to conditionally skip (e.g., horizontal scroll test only makes sense on mobile where track width exceeds viewport)
+- **Mobile tests are tagged** with `@mobile` for documentation and optional filtering, but still run on both viewports by default
+
+**Why both viewports run the same tests:**
+- Catches regressions when mobile styles break desktop layouts or vice versa
+- Ensures responsive breakpoints transition correctly (mobile → tablet → desktop)
+- Validates that touch-friendly sizing doesn't negatively impact desktop UX
+- Follows Playwright's best practice: "run the same tests in different configurations"
+
+**CI/CD runs:**
+- `test:e2e:desktop` (Chromium)
+- `test:e2e:mobile` (Pixel 5)
+
+This covers both viewports efficiently without running the full browser matrix (chromium, firefox, webkit, mobile) on every deploy.
+
 - Future consideration: Full-file coverage could be achieved by aggregating E2E coverage into reports or adding lightweight component smoke tests for pages/App.
 
 ## App structure

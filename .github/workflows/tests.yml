@@ -24,8 +24,10 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - name: Install browsers
         run: npx playwright install --with-deps
-      - name: E2E tests
-        run: npm run test:e2e
+      - name: E2E tests (Desktop)
+        run: npm run test:e2e:desktop
+      - name: E2E tests (Mobile)
+        run: npm run test:e2e:mobile
       - name: Upload coverage (optional)
         if: always()
         uses: actions/upload-artifact@v4
